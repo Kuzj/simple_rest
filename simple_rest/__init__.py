@@ -7,8 +7,7 @@ from aiohttp.web_exceptions import HTTPMethodNotAllowed
 from aiohttp.web_request import Request
 from aiohttp.web_urldispatcher import UrlDispatcher
 
-#DEFAULT_METHODS = ('GET', 'POST', 'PUT', 'DELETE')
-DEFAULT_METHODS = ('POST', 'PUT')
+DEFAULT_METHODS = ('GET','POST', 'PUT')
 
 class RestEndpoint:
 
@@ -30,8 +29,7 @@ class RestEndpoint:
         for route in self.routes():
             try:
                 router.add_route('*', route, self.dispatch)
-                if logging.getLogger().getEffectiveLevel() == logging.DEBUG:
-                    logging.info(f'{self.__class__} register {route}')
+                logging.info(f'{self.__class__} register {route}')
             except RuntimeError as e:
                 raise RuntimeError(f'{e}: {self.__class__} not register {route}')
 
