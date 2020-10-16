@@ -2,18 +2,19 @@
 import logging
 from aiohttp.web import Application, run_app
 
+import endpoints
 from simple_rest import RestEndpoint
-from endpoints.test import TestEndpoint
-from endpoints.grafana import GrafanaEndpoint
 
-logging.basicConfig(level=logging.DEBUG)
+format = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+logging.basicConfig(format=format, level=logging.DEBUG)
+log_file_handler = logging.FileHandler(filename='app.log')
+formatter = logging.Formatter(format)
+log_file_handler.setFormatter(formatter)
+logging.getLogger().addHandler(log_file_handler)
 
-#  TODO: Загружать все endpoints из папки, например как actions
 app = Application()
-test = TestEndpoint()
-test.register_routes(app.router)
-grafana = GrafanaEndpoint()
-grafana.register_routes(app.router)
+for module in endpoints.endpoints_list:
+    module.Endpoint().register_routes(app.router)
 
 if __name__ == "__main__":
     

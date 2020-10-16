@@ -23,7 +23,7 @@ class ActionFormatError(GrafanaError):
     pass
 
 # TODO: Обработать сообщение когда проблема решается, например ничего не делать если 'state':'ok'
-class GrafanaEndpoint(RestEndpoint):
+class Endpoint(RestEndpoint):
     '''
     {"action":{
     "name":"http_request",
@@ -38,7 +38,7 @@ class GrafanaEndpoint(RestEndpoint):
     #  TODO: Сделать access list например по хосту и методу (лучше на уровне actions??)
     async def do_action(self):
         if all([ _ in self.action for _ in ['name','method','url','data']]):
-            if self.action['name'] in actions.actions_list:
+            if self.action['name'] in actions.actions_name_list:
                 action = getattr(actions, self.action['name'])
                 method = getattr(action, self.action['method'])
                 await method(self.action['url'], self.action['data'])

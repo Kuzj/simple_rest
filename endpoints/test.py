@@ -4,7 +4,7 @@ from aiohttp.web import Request
 
 from simple_rest import RestEndpoint
 
-class TestEndpoint(RestEndpoint):
+class Endpoint(RestEndpoint):
 
     def routes(self):
         return ['/test',]
