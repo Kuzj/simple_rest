@@ -26,6 +26,8 @@ class Endpoint(RestEndpoint):
         return ['/json',]
 
     async def post(self, request: Request) -> Response:
+        text = await request.text()
+        logging.info(f'{text}')
         data = await request.json()
         logging.info(f'{self.__class__} {request.path} from {request.host} {request.method} request: {data}')
         if 'action' in data:
