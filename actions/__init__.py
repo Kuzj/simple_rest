@@ -1,7 +1,8 @@
 from pkgutil import iter_modules
 from pathlib import Path
 from importlib import import_module
-from typing import List
+from typing import (Dict, List)
+from inspect import (getmembers, isfunction, signature)
 
 class ActionError(Exception):
     """Base class for exceptions in action."""
@@ -10,8 +11,21 @@ class ActionError(Exception):
 class ActionNotFound(ActionError):
     pass
 
-actions_name_list: List[str] = []
+class MethodNotFound(ActionError):
+    pass
+
+class ArgumentMissing(ActionError):
+    pass
+
+class ActionFormatError(ActionError):
+    pass
+
+actions_dict: Dict[str, Dict[str, List[str]]] = {}
 package_dir = Path(__file__).resolve().parent
 for (_, module_name, _) in iter_modules([package_dir]):
-    import_module(f"{__name__}.{module_name}")
-    actions_name_list.append(module_name)
+    module = import_module(f"{__name__}.{module_name}")
+    module_functions = (f for f in getmembers(module) if isfunction(f[1]))
+    function_dict = {}
+    for func in module_functions:
+        function_dict[func[0]] = list(signature(func[1]).parameters.keys())
+    actions_dict[module_name] = function_dict

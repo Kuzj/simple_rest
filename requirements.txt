@@ -1,1 +1,2 @@
 aiohttp==3.6.2
+mailru-im-bot==0.0.14
