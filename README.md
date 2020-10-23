@@ -16,5 +16,16 @@ $ ./app.py
 
 Для использования ICQ bot необходимо экспортировать переменную
 ```sh
-$ export icqbot_[bot name]=[token]
+$ export icqbot_[name]=[token]
+```
+
+### Docker
+
+```sh
+$ docker build -t simple_rest .
+$ docker run --restart=unless-stopped \
+--name simple_rest_1 -d -p 8800:8800 \
+-e icqbot_[name]=[token] \
+-e icqbot_[name]=[token] \
+simple_rest
 ```

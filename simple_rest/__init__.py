@@ -64,7 +64,6 @@ class RestEndpoint:
                     if all([p in action_request for p in args]):
                         action = getattr(actions, name)
                         method = getattr(action, method)
-                        print(*[action_request[a] for a in args])
                         await method(*[action_request[a] for a in args])
                     else:
                         raise actions.ArgumentMissing(f"Required arguments {args}")
