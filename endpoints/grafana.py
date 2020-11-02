@@ -1,10 +1,12 @@
 import logging
 import json
+
 from aiohttp.web_response import Response
 from aiohttp.web import Request
 
 import actions
 from simple_rest import RestEndpoint
+from helpers import dict2namedtuple
 
 class GrafanaError(Exception):
     """Base class for exceptions in GrafanaEndpoint."""
@@ -18,7 +20,6 @@ class NoActionInMessage(GrafanaError):
     """Erorr in message from grafana post data"""
     pass
 
-# TODO: Обработать сообщение когда проблема решается, например ничего не делать если 'state':'ok'
 class Endpoint(RestEndpoint):
     '''
     {"action":{
@@ -32,23 +33,34 @@ class Endpoint(RestEndpoint):
         return ['/grafana',]
 
     async def post(self, request: Request) -> Response:
+        '''
+        grafana_request_fields = ('dashboardId', 
+                                  'evalMatches', 
+                                  'message', 
+                                  'orgId', 
+                                  'panelId', 
+                                  'ruleId', 
+                                  'ruleName', 
+                                  'ruleUrl', 
+                                  'state', 
+                                  'tags', 
+                                  'title')
+        '''
         data = await request.json()
         logging.info(f'{self.__class__} {request.path} from {request.host} {request.method} request: {data}')
-        if 'message' in data:
-            #  TODO: Придумать что делать если message не json
-            try:
-                grafana_message = json.loads(data["message"])
-            except json.decoder.JSONDecodeError:
-                return Response(status=200)
-            if 'action' in grafana_message:
-                await self.do_action(grafana_message["action"])
-            else:
-                #  HTTPBadRequest
-                Response(status=400)
-                raise NoActionInMessage
+        grafana_request = dict2namedtuple('grafana_request', data)
+        #  TODO: Придумать что делать если message не json
+        try:
+            grafana_message = dict2namedtuple('grafana_message', json.loads(grafana_request.message))
+        except json.decoder.JSONDecodeError:
             return Response(status=200)
-        else:
-            #  HTTPBadRequest
+        except AttributeError:
             Response(status=400)
             raise NoMessageInRequest()
+        try:
+            await self.do_action(grafana_message.action)
+        except AttributeError:
+            Response(status=400)
+            raise NoActionInMessage
+        return Response(status=200)
         
