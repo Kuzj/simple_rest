@@ -9,5 +9,4 @@ COPY --from=builder /install /usr/local
 WORKDIR /app
 COPY . .
 EXPOSE 8800:8800
-ENV PATH=/root/.local:$PATH
 CMD [ "python", "./app.py"]
